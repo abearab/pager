@@ -1,8 +1,8 @@
 ## $1: input file contain table with first two columns as gene name/id and numeric value
 species='human'
 runMode='gene_name' # or ensembl
-outdir=${1/.txt/};
 expfile=`basename $1`
+outdir=${1/.txt/};
 ipage_ann='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS/'
 
 
