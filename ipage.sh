@@ -1,6 +1,6 @@
 ## $1: input file contain table with first two columns as gene name/id and numeric value
 species='human'
-runMode='gene_name' # or ensembl
+runMode='ensembl' # or gene_name
 expfile=`basename $1`
 outdir=${1/.txt/};
 ipage_ann='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS/'
@@ -71,7 +71,7 @@ for f in `ls -d ${ipage_ann}/${pattern}`; do
                 else 
                     echo '_____...________' $base $side '...';
                     mkdir -p ${expfile}_PAGE;
-                    perl /flash/bin/iPAGEv1.0/SCRIPTS/mi_go_draw_matrix.pl  \
+                    perl $PAGEDIR/SCRIPTS/mi_go_draw_matrix.pl  \
                     --pvaluematrixfile=${outdir}/${base}/pvmatrix.${side}.txt \
                     --expfile=$expfile \
                     --order=1 --draw_sample_heatmap=false \
