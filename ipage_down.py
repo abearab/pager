@@ -1,124 +1,86 @@
-import pandas as pd
+import os 
+import re 
 from glob import glob
+import itertools
+import pandas as pd
 
 
-def read_gmt(PATH):
+def read_page_index(gs,PATH):
     '''
-    Read given gmt file into a Dictionary 
-    '''
-    with open(PATH) as gmt:
-        lines = gmt.readlines()
-        out = {}
-        for line in lines:
-            data = line.split('\t')
-            name = data[0]
-            url  = data[1]
-            genes= data[2:]
-            genes[-1] = genes[-1].split('\n')[0]
-
-            out[name] = {}
-            out[name]['url'] = url 
-            out[name]['genes'] = genes
-            
-    return out
-
-
-def read_page_index(PATH):
-    '''
-    Read given *index.txt files into a Dictionary 
+    Find genes associated to given geneset in *index.txt files 
     '''
     with open(PATH) as raw:
-        lines = raw.readlines()
-        genes_dict = {}
-        for line in lines:
-            data = line.split('\t')
-            gene = data[0]
-            genesets  = data[1:]
-            genesets[-1] = genesets[-1].split('\n')[0]
-
-            genes_dict[gene] = genesets
-            
-    # list all unique genesets 
-    all_gs = []
-    for gs in genes_dict.values():
-        all_gs = all_gs + gs
-    all_gs = set(all_gs)
-    
-    # dictionary which keys are genesets and values are associated genes 
-    gs_dict = {}
-    for gs in all_gs:
-        gs_dict[gs] = {g for g in genes_dict.keys() if gs in genes_dict[g]}
+        lines = [line for line in raw.read().splitlines()] 
+        lines = [line.split('\t') for line in lines if re.search(gs, line)]
         
-    out = gs_dict
+        genes = [line[0] for line in lines ]
     
-    return out
+    return genes
 
 
-def read_page_names(PATH):
+
+def read_page_names(gs, PATH):
     '''
-    Read given *name.txt files into a Dictionary 
+    Find annotations associated to given geneset in *names.txt files 
     '''
     with open(PATH) as raw:
-        lines = raw.readlines()
-        out = {}
-    for line in lines:
-            data = line.split('\t')
-            name0= data[0]
-            name1= data[1]
-            pw_type= data[2].split('\n')[0]
-            out[name0] = [name1, pw_type]
-    return out
+        lines = [line for line in raw.read().splitlines()] 
+        anns  = [line.split('\t') for line in lines if re.search(gs, line)]
+        
+    return anns
 
 
-def subset_dict(dic, df):
-    return dict((i, dic[i]) for i in df.index.tolist() if i in dic)
-
-
-def read_page_annotations(gs_name,pv_df,ANNDIR='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS/'):
+def read_page_annotations(gs,gs_clst,ANNDIR='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS'):
     '''
-    Read gene set annotations into python from PAGE_DATA format
+    Read geneset annotations and list of genes from PAGE_DATA format (*index.txt and *names.txt files)
     '''
     annotations = {}
-    gmt_path = glob(f'{ANNDIR}{gs_name}/*.gmt')
-    index_path = glob(f'{ANNDIR}{gs_name}/*_index.txt')
-    names_path = glob(f'{ANNDIR}{gs_name}/*_names.txt')
-    if index_path:
-        index = read_page_index(index_path[0])
-        annotations['index'] = subset_dict(index,pv_df)
-    if names_path:
-        names = read_page_names(names_path[0])
-        annotations['names'] = subset_dict(names,pv_df)
-    if gmt_path:
-        gmt = read_gmt(gmt_path[0])
-        annotations['gmt'] = subset_dict(gmt,pv_df)
+    
+    names_path = glob(f'{ANNDIR}/{gs_clst}/*_names.txt')
+    index_path = glob(f'{ANNDIR}/{gs_clst}/*_index.txt')
+    
+    genes = read_page_index(gs,index_path[0])
+    anns  = read_page_names(gs,names_path[0])
+    
+    annotations[anns[0][0]] = {}
+    annotations[anns[0][0]]['names'] = anns[0][1:]
+    annotations[anns[0][0]]['genes'] = genes
     
     return annotations
 
 
-def make_page_dict(PATH):
-    '''
-    PATH = a complete path to a pvmatrix.txt file, part of results from iPAGE run 
-    
-    Processes: 
-    1) Read p-value matrix data into a data frame
-    2) Include annotations for the gene set from the PAGE directory
-    
-    Output: Python dictionary contain pvmatrix and related annotations to the gene set
-    '''
-    ### 1 ### 
-    # read pvmatrix.txt file 
-    pv_df = pd.read_csv(PATH, sep='\t',index_col=0)
-    # remove duplicated named (row) names 
-    if all([geneset.split(' ')[0] == geneset.split(' ')[1] for geneset in pv_df.index.tolist()]):
-        pv_df.index = [geneset.split(' ')[0] for geneset in pv_df.index.tolist() ]
-        
-    ### 2 ### 
-    gs_name = PATH.split('/')[-2]
-    ann = read_page_annotations(gs_name,pv_df)
 
+def read_pvmatrix(PATH):
+    '''
+    Read p-value matrix (pvmatrix.txt files) into dataframes 
+    '''
+    pv_df = pd.read_csv(PATH, sep='\t',index_col=0) 
+    genesets = [geneset.split(' ')[0] for geneset in pv_df.index.tolist()]
+    pv_df.index = genesets
+    
+    return pv_df
+
+
+# def read_pvmatrix_killed()
+
+
+def make_ipage_run_dict(parent_dir):
+    '''
+    Include annotations for the genesets in each result tables 
+    '''
+    gs_clsters = [os.path.basename(os.path.normpath(d)) for d in glob(parent_dir+'*/')]
+        
     out = {}
-    out['gs_name'] = gs_name
-    out['annotations'] = ann
-    out['data'] = pv_df
+    
+    # for in for would be super slow!
+    for gs_clst in gs_clsters:
+        pv_df = read_pvmatrix(f'{parent_dir}/{gs_clst}/pvmatrix.txt')
+        ann = {}
+        for gs in pv_df.index:
+            ann.update(read_page_annotations(gs,gs_clst))
+        
+        out[gs_clst] = {}
+        out[gs_clst]['annotations'] = ann
+        out[gs_clst]['pvmatrix'] = pv_df
     
     return out
