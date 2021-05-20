@@ -1,24 +1,20 @@
 ## $1: input file contain table with first two columns as gene name/id and numeric value
 species='human'
+<<<<<<< HEAD
+pattern='human_*gs*'
+# pattern='human_ensembl*'
+=======
 runMode='ensembl' # or gene_name
+>>>>>>> 650ce6edaecac730533004bcd1e6a3a8bbe7c089
 expfile=`basename $1`
 outdir=${1/.txt/};
 ipage_ann='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS/'
-
 
 
 mkdir -p $outdir
 cd $outdir; cd ../
 
 echo `pwd`
-
-if [[ $runMode="gene_name" ]] && [[ $species="human" ]]; 
-then
-    pattern='human_*gs*';
-elif [[ $runMode="ensembl" ]] && [[ $species="human" ]]; 
-then
-    pattern='human_ensembl*'
-fi
 
 for f in `ls -d ${ipage_ann}/${pattern}`; do
 
