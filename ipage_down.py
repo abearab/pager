@@ -30,7 +30,7 @@ def read_page_names(gs, PATH):
     return anns
 
 
-def read_page_annotations(gs,gs_clst,ANNDIR='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS'):
+def read_page_annotations(gs,gs_clst,ANNDIR):
     '''
     Read geneset annotations and list of genes from PAGE_DATA format (*index.txt and *names.txt files)
     '''
@@ -64,7 +64,7 @@ def read_pvmatrix(PATH):
 # def read_pvmatrix_killed()
 
 
-def make_ipage_run_dict(parent_dir):
+def make_ipage_run_dict(parent_dir, ANNDIR='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS'):
     '''
     Include annotations for the genesets in each result tables 
     '''
@@ -77,7 +77,7 @@ def make_ipage_run_dict(parent_dir):
         pv_df = read_pvmatrix(f'{parent_dir}/{gs_clst}/pvmatrix.txt')
         ann = {}
         for gs in pv_df.index:
-            ann.update(read_page_annotations(gs,gs_clst))
+            ann.update(read_page_annotations(gs,gs_clst,ANNDIR))
         
         out[gs_clst] = {}
         out[gs_clst]['annotations'] = ann
