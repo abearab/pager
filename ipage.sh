@@ -1,17 +1,8 @@
 ## $1: input file contain table with first two columns as gene name/id and numeric value
 species='human'
-<<<<<<< HEAD
 pattern='human_*gs*'
 # pattern='human_ensembl*'
 
-=======
-<<<<<<< HEAD
-pattern='human_*gs*'
-# pattern='human_ensembl*'
-=======
-runMode='ensembl' # or gene_name
->>>>>>> 650ce6edaecac730533004bcd1e6a3a8bbe7c089
->>>>>>> 595c0a32bf0138e01f19fdfc0e84f1975a01b248
 expfile=`basename $1`
 outdir=${1/.txt/};
 ipage_ann='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS/'
