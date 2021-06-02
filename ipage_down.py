@@ -1,5 +1,6 @@
 import os 
 import re 
+import gzip
 from glob import glob
 import itertools
 import pandas as pd
@@ -9,12 +10,22 @@ def read_page_index(gs,PATH):
     '''
     Find genes associated to given geneset in *index.txt files 
     '''
-    with open(PATH) as raw:
-        lines = [line for line in raw.read().splitlines()] 
+    def read_it(raw):
+        lines = [line for line in raw.read().splitlines()]
         lines = [line.split('\t') for line in lines if re.search(gs, line)]
-        
-        genes = [line[0] for line in lines ]
-    
+
+        genes = [line[0] for line in lines]
+
+        return genes
+
+    if PATH.endswith('.gz'):
+        with gzip.open(PATH, 'rt') as raw:
+            genes = read_it(raw)
+
+    else:
+        with open(PATH) as raw:
+            genes = read_it(raw)
+
     return genes
 
 
@@ -23,22 +34,36 @@ def read_page_names(gs, PATH):
     '''
     Find annotations associated to given geneset in *names.txt files 
     '''
-    with open(PATH) as raw:
-        lines = [line for line in raw.read().splitlines()] 
-        anns  = [line.split('\t') for line in lines if re.search(gs, line)]
-        
+    def read_it(raw):
+        lines = [line for line in raw.read().splitlines()]
+        anns = [line.split('\t') for line in lines if re.search(gs, line)]
+
+        return anns
+
+    if PATH.endswith('.gz'):
+        with gzip.open(PATH, 'rt') as raw:
+            anns = read_it(raw)
+
+    else:
+        with open(PATH) as raw:
+            anns = read_it(raw)
+
     return anns
 
 
-def read_page_annotations(gs,gs_clst,ANNDIR):
+def read_page_annotations(gs,gs_clst,ANNDIR,gz):
     '''
     Read geneset annotations and list of genes from PAGE_DATA format (*index.txt and *names.txt files)
     '''
     annotations = {}
     
-    names_path = glob(f'{ANNDIR}/{gs_clst}/*_names.txt')
-    index_path = glob(f'{ANNDIR}/{gs_clst}/*_index.txt')
-    
+    if gz:
+        names_path = glob(f'{ANNDIR}/{gs_clst}/*_names.txt.gz')
+        index_path = glob(f'{ANNDIR}/{gs_clst}/*_index.txt.gz')
+    else:
+        names_path = glob(f'{ANNDIR}/{gs_clst}/*_names.txt')
+        index_path = glob(f'{ANNDIR}/{gs_clst}/*_index.txt')
+
     genes = read_page_index(gs,index_path[0])
     anns  = read_page_names(gs,names_path[0])
     
@@ -64,7 +89,7 @@ def read_pvmatrix(PATH):
 # def read_pvmatrix_killed()
 
 
-def make_ipage_run_dict(parent_dir, ANNDIR='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS'):
+def make_ipage_run_dict(parent_dir, ANNDIR='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOTATIONS', gz=True):
     '''
     Include annotations for the genesets in each result tables 
     '''
@@ -77,7 +102,7 @@ def make_ipage_run_dict(parent_dir, ANNDIR='/flash/bin/iPAGEv1.0/PAGE_DATA/ANNOT
         pv_df = read_pvmatrix(f'{parent_dir}/{gs_clst}/pvmatrix.txt')
         ann = {}
         for gs in pv_df.index:
-            ann.update(read_page_annotations(gs,gs_clst,ANNDIR))
+            ann.update(read_page_annotations(gs,gs_clst,ANNDIR,gz))
         
         out[gs_clst] = {}
         out[gs_clst]['annotations'] = ann
