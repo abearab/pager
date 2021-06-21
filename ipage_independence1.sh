@@ -1,7 +1,7 @@
 ## $1: input file contain table with first two columns as gene name/id and numeric value
 species='human'
-pattern='human_*gs*'
-# pattern='human_ensembl*'
+# pattern='human_*gs*'
+pattern='human_ensembl*'
 
 expfile=`basename $1`
 outdir=${1/.txt/};
@@ -24,7 +24,7 @@ for f in `ls -d ${ipage_ann}/${pattern}`; do
     ## TO-DO; Force run to remove stuff from previous run. 
     else
         # Run iPAGE 
-        perl $PAGEDIR/page.pl --expfile=$expfile \
+        perl $PAGEDIR/page.pl --expfile=$expfile --independence=1 \
         --species=$base --exptype=continuous --ebins=11 --nodups=1; 
         wait
 
