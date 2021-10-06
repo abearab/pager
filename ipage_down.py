@@ -6,6 +6,27 @@ import itertools
 import pandas as pd
 
 
+def write_page_index(input, PATH):
+    """Genesets of each gene
+    Write correctly formatted {PATH}_index.txt file
+    input: dictionary; keys are genes and values are gene sets
+    """
+    with gzip.open(PATH, 'wt') as raw:
+        for gn,gs in input.items():
+            raw.write('\t'.join([gn] + list(gs))+'\n')
+
+
+def write_page_names(input, PATH,gz=None):
+    """Genesets annotation
+    Write {PATH}_names.txt file
+    input: pandas dataframe with three columns
+        1) Geneset index matched with page_index values
+        2) Geneset name (human readable)
+        3) Name Space from GO database (???)
+    """
+    input.to_csv(PATH, index=True,header=False, sep='\t', compression='gzip')
+    
+    
 def read_page_index(gs, PATH):
     """
     Find genes associated to given geneset in *index.txt files 
