@@ -16,7 +16,7 @@ def write_page_index(input, PATH):
             raw.write('\t'.join([gn] + list(gs))+'\n')
 
 
-def write_page_names(input, PATH,gz=None):
+def write_page_names(input, PATH):
     """Genesets annotation
     Write {PATH}_names.txt file
     input: pandas dataframe with three columns
@@ -27,7 +27,7 @@ def write_page_names(input, PATH,gz=None):
     input.to_csv(PATH, index=True,header=False, sep='\t', compression='gzip')
     
     
-def read_page_index(gs, PATH):
+def search_page_index(gs, PATH):
     """
     Find genes associated to given geneset in *index.txt files 
     """
@@ -51,7 +51,7 @@ def read_page_index(gs, PATH):
     return genes
 
 
-def read_page_names(gs, PATH):
+def search_page_names(gs, PATH):
     """
     Find annotations associated to given geneset in *names.txt files 
     """
