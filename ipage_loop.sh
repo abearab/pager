@@ -1,14 +1,12 @@
 ## $1: input file contain table with first two columns as gene name/id and numeric value
-pattern='human_*gs*'
-# pattern='human_ensembl*'
+pattern='msigdb*'
+# pattern='human_*_gs*'
 
 expfile=`basename $1`
 outdir=${1/.txt/};
 
 mkdir -p $outdir
 cd $outdir; cd ../
-
-echo `pwd`
 
 for f in `ls -d $PAGEDIR/PAGE_DATA/ANNOTATIONS/${pattern}`; do
 
@@ -20,9 +18,8 @@ for f in `ls -d $PAGEDIR/PAGE_DATA/ANNOTATIONS/${pattern}`; do
         echo 'This result exist!';
     else
         # Run iPAGE 
-        perl $PAGEDIR/page.pl --expfile=$expfile \
+        perl $PAGEDIR/page.pl --expfile=$expfile --species=$base --exptype=continuous --ebins=11 --nodups=1; 
         # --independence=0 # option for comparing results between multiple smaples.
-        --species=$base --exptype=continuous --ebins=11 --nodups=1; 
         wait
 
         mv -v ${expfile}_PAGE/ ${outdir}/${base}/;
@@ -68,10 +65,9 @@ for f in `ls -d $PAGEDIR/PAGE_DATA/ANNOTATIONS/${pattern}`; do
                     --min=-3 --max=3 \
                     --cluster=5 --quantized=0;
                     wait
-                    for sum in `ls ${expfile}_PAGE`; do 
-                        sumS=${sum/summary/$side};
-                        mv -v ${expfile}_PAGE/${sum} ${outdir}/${base}/${sumS};
-                    done     
+                    for sum in `ls ${expfile}_PAGE/*.summary*.pdf`; do 
+                        mv -v ${sum} ${outdir}/${base}.${side}.pdf
+                    done
                     rm -vr ${expfile}_PAGE;
                 fi;
 
