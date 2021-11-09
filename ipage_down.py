@@ -86,8 +86,8 @@ def read_page_annotations(gs, gs_clst, ANNDIR, gz):
         names_path = glob(f'{ANNDIR}/{gs_clst}/*_names.txt')
         index_path = glob(f'{ANNDIR}/{gs_clst}/*_index.txt')
 
-    genes = read_page_index(gs, index_path[0])
-    anns = read_page_names(gs, names_path[0])
+    genes = search_page_index(gs, index_path[0])
+    anns  = search_page_names(gs, names_path[0])
 
     annotations[anns[0][0]] = {}
     annotations[anns[0][0]]['names'] = anns[0][1:] + [gs_clst]
