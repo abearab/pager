@@ -107,6 +107,17 @@ def read_pvmatrix(PATH):
     return pv_df
 
 
+def clean_bins_range(pv_df):
+    bins = pv_df.columns.tolist()
+    ranges = [bn.replace('[','').replace(']','').split(' ') for bn in bins]
+    ave = sum([(float(b) - float(a)) for a,b in ranges[1:-1]]) / len(ranges[1:-1])
+    ranges[0][0]  = str(round(float(ranges[0][1])  - ave,2))
+    ranges[-1][1] = str(round(float(ranges[-1][0]) + ave,2))
+
+    pv_df.columns = [f'[{a} {b}]' for a,b in ranges]
+    return pv_df
+    
+
 def style_clean_pvmatrix(pv_df):
     a, b = pv_df.columns
     return pv_df.sort_values([a, b], ascending=[True, False]).style.applymap(
@@ -175,6 +186,55 @@ def make_annotation_dict(pv_df, ANNDIR=f'{os.path.dirname(__file__)}/annotations
         ann.update(read_page_annotations(gene_set, gs_cluster, ANNDIR, gz))
 
     return ann
+
+
+def read_ipage_intersections_file(gs_cluster_path,clust,gs=None):
+    '''read data from `output.ipage_intersections` file from an iPAGE run
+    `output.ipage_intersections` is a three column table that identify genes enriched in each cluster bins. 
+    # Group	Cluster	Identifiers
+
+    Args:
+        gs_cluster_path: path to the parent directory of `output.ipage_intersections` file.
+        clust: the cluster (bin) number to extract identifiers.
+        gs: gene set name to search .
+    Returns:
+        a dictionary in which keys are pathway names and values are genes reported in given `clust`.
+    '''
+    # Group	Cluster	Identifiers
+    with open(f'{gs_cluster_path}/output.ipage_intersections') as raw:
+        lines = [line for line in raw.read().splitlines()]
+        if gs: 
+            lines = [line.split('\t') for line in lines if re.search(gs, line)]
+        else:
+            lines = [line.split('\t') for line in lines]
+
+    return dict([(line[0].split(' ')[0],line[2:]) for line in lines if line[1] == clust ])
+
+
+def merge_multiple_pvmat(pvmat_list):
+    '''merge multiple `pvmatrix.txt` files from different iPAGE runs (on one input) 
+
+    Args:
+        pvmat_list: list of pvmatrix file path.
+    Returns:
+        pandas data.frame
+    '''
+    df = ipd.clean_bins_range(
+        ipd.read_pvmatrix(pvmat_list[0])
+    )
+    
+    cols = df.columns
+    
+    df = pd.concat(
+        [df] + [
+            ipd.read_pvmatrix(pvmat).set_axis(cols, axis=1, inplace=False) 
+            for pvmat in pvmat_list[1:]
+        ]
+    )
+    
+    df = df.groupby(df.index).first()
+    # ipd.style_clean_pvmatrix(df.iloc[:,[0,10]])    
+    return df
 
 
 # def check_gene(ann,genes):
