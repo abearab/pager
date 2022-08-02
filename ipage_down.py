@@ -125,24 +125,6 @@ def style_clean_pvmatrix(pv_df):
     )
 
 
-def read_pvmatrix_killed(PATH):
-    """
-    Read pvmatrix.txt.killed files that contains list of related gene sets those enriched (pvmatrix.txt)
-    """
-    with open(PATH) as killed:
-        lines = [line for line in killed.read().splitlines()]
-        out = {}
-        for line in lines:
-            if '\t' not in line:
-                geneset0 = line.split(', ')[0]
-                out[geneset0] = []
-            else:
-                geneset1 = line.split(', ')[0].replace('\t', '')
-                out[geneset0].append(geneset1)
-
-    return out
-
-
 def make_ipage_run_data_frame(parent_dir, clean=True):
     """
     some note
@@ -188,7 +170,31 @@ def make_annotation_dict(pv_df, ANNDIR=f'{os.path.dirname(__file__)}/annotations
     return ann
 
 
-def read_ipage_intersections_file(gs_cluster_path,clust,gs=None):
+def read_pvmatrix_killed(gs_cluster_path):
+    '''read data from `pvmatrix.txt.killed` file from an iPAGE run
+    `pvmatrix.txt.killed` file contains list of related gene sets to enriched gene sets. 
+    
+    Args:
+        gs_cluster_path: path to the parent directory of `output.ipage_intersections` file.
+    Returns:
+        a dictionary in which keys are enriched pathway names and values are related pathway names
+    '''
+    PATH = f'{gs_cluster_path}/pvmatrix.txt.killed'
+    with open(PATH) as killed:
+        lines = [line for line in killed.read().splitlines()]
+        out = {}
+        for line in lines:
+            if '\t' not in line:
+                geneset0 = line.split(', ')[0]
+                out[geneset0] = []
+
+            else:
+                geneset1 = line.split(', ')[0].replace('\t', '')
+                out[geneset0].append(geneset1)
+
+    return out
+
+def bin_identifier_genes(gs_cluster_path,clust,gs=None):
     '''read data from `output.ipage_intersections` file from an iPAGE run
     `output.ipage_intersections` is a three column table that identify genes enriched in each cluster bins. 
     # Group	Cluster	Identifiers
@@ -200,7 +206,6 @@ def read_ipage_intersections_file(gs_cluster_path,clust,gs=None):
     Returns:
         a dictionary in which keys are pathway names and values are genes reported in given `clust`.
     '''
-    # Group	Cluster	Identifiers
     with open(f'{gs_cluster_path}/output.ipage_intersections') as raw:
         lines = [line for line in raw.read().splitlines()]
         if gs: 
@@ -219,22 +224,30 @@ def merge_multiple_pvmat(pvmat_list):
     Returns:
         pandas data.frame
     '''
-    df = ipd.clean_bins_range(
-        ipd.read_pvmatrix(pvmat_list[0])
+    df = clean_bins_range(
+        read_pvmatrix(pvmat_list[0])
     )
     
     cols = df.columns
     
     df = pd.concat(
         [df] + [
-            ipd.read_pvmatrix(pvmat).set_axis(cols, axis=1, inplace=False) 
+            read_pvmatrix(pvmat).set_axis(cols, axis=1, inplace=False) 
             for pvmat in pvmat_list[1:]
         ]
     )
     
     df = df.groupby(df.index).first()
-    # ipd.style_clean_pvmatrix(df.iloc[:,[0,10]])    
+    # style_clean_pvmatrix(df.iloc[:,[0,10]])    
     return df
+
+
+def detect_gs_cluster(pvmat_list, gs):
+    return [
+        pvmat for pvmat in pvmat_list
+        if gs in read_pvmatrix(pvmat).index.to_list()
+        
+    ]
 
 
 # def check_gene(ann,genes):
