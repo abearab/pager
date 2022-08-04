@@ -250,6 +250,32 @@ def detect_gs_cluster(pvmat_list, gs):
     ]
 
 
+def pvmat2bio_signal(pvmat,side,n_clust=2):
+    if side == 'up':
+        out = pvmat.loc[
+            (pd.DataFrame(pvmat.iloc  [:,-n_clust:]  > 2).all(axis=1)) & 
+            (pd.DataFrame(pvmat.iloc  [:,:-n_clust]  < 2).all(axis=1))
+            ,:
+        ].sort_values(by=pvmat.columns[-n_clust:].to_list()[::-1],ascending=False,axis=0)
+    elif side == 'both':
+        out = pvmat.loc[
+            (pd.DataFrame(pvmat.iloc  [:,:n_clust]  > 2).all(axis=1)) & 
+            (pd.DataFrame(pvmat.iloc  [:,-n_clust:]  > 2).all(axis=1)) & 
+            (pd.DataFrame(pvmat.iloc  [:,n_clust+1:-n_clust]  < 2).all(axis=1))
+            ,:
+        ].sort_values(
+            by=pvmat.columns[-n_clust:].to_list()[::-1] + pvmat.columns[:n_clust].to_list(),
+            ascending=False,axis=0
+        )
+    elif side == 'down':
+        out = pvmat.loc[
+            (pd.DataFrame(pvmat.iloc  [:,:n_clust]  > 2).all(axis=1)) & 
+            (pd.DataFrame(pvmat.iloc  [:,n_clust+1:]  < 2).all(axis=1))
+            ,:
+        ].sort_values(by=pvmat.columns[:n_clust].to_list(),ascending=False,axis=0)
+    return out
+
+
 # def check_gene(ann,genes):
 #     membs = {}
 #     for gs in ann:
