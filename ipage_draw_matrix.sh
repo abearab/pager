@@ -6,6 +6,7 @@ function draw_matrix()
 
     local expfile=$1;
     local pvaluematrixfile=$2;
+    local output=$3;
     
     perl ${PAGEDIR}/SCRIPTS/mi_go_draw_matrix.pl  \
             --pvaluematrixfile=${pvaluematrixfile} \
@@ -14,11 +15,10 @@ function draw_matrix()
             --min=-3 --max=3 \
             --cluster=5 --quantized=0;
     wait
-    pic=${expfile/.txt/.pdf}
-    for sum in `ls ${expfile}_PAGE/*.summary*.pdf`; do 
-        mv -v ${sum} ${pic}
-    done
-    rm -vr ${expfile}_PAGE;
+
+    mv -v ${expfile}_PAGE/${expfile}.summary.pdf $output
+    rm -rv ${expfile}_PAGE/
+
 }
 
-draw_matrix $1 $2
+draw_matrix $1 $2 $3
