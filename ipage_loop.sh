@@ -1,6 +1,7 @@
 ## $1: input file contain table with first two columns as gene name/id and numeric value
-pattern='msigdb*'
-# pattern='human_*_gs*'
+# pattern='msigdb_v0.3_m*'
+pattern='msigdb_v7*'
+
 
 expfile=`basename $1`
 outdir=${1/.txt/};
