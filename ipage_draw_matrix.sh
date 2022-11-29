@@ -1,6 +1,6 @@
 function draw_matrix()
 {
-    export PAGEDIR='/data_gilbert/home/aarab/iPAGE'
+    export PAGEDIR='/data_gilbert/home/aarab/Workflows/iPAGE'
     
     mkdir -p ${1}_PAGE;
 
