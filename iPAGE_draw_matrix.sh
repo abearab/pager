@@ -1,6 +1,9 @@
 function draw_matrix()
 {
-    export PAGEDIR='/data_gilbert/home/aarab/Workflows/iPAGE'
+    if [ -z ${PAGEDIR+x} ]; then
+        echo "Error: PAGEDIR is not set. Please set PAGEDIR to the iPAGE directory.";
+        return;
+    fi
     
     mkdir -p ${1}_PAGE;
 

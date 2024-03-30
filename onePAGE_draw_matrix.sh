@@ -1,6 +1,9 @@
 function draw_matrix()
 {
-    export TEISERDIR='/data_gilbert/home/aarab/Workflows/TEISERv1.1'
+    if [ -z ${TEISERDIR+x} ]; then
+        echo "Error: TEISERDIR is not set. Please set TEISERDIR to the TEISER directory.";
+        return;
+    fi
     
     local pdir=$1;
     local exp=$2;
