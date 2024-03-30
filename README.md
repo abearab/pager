@@ -25,7 +25,7 @@ conda activate pager
 ## Background and usage
 Codes in this repo generate automated plots and result tables using orignial tools but it enables further data cleaning and imputation to keep / assemble biological meaningful results for hypothesis generation or testing. A python reimplementation of the PAGE algorithm is also provided at https://github.com/goodarzilab/pypage. However, this repo is focused on the original tools mostly implented in Perl.
 
-#### PAGE algorithm
+### PAGE algorithm
 [PAGE](https://github.com/hanig/PAGE) algorithm is a set enrichment analysis tool. It's orignially developed by @hanig for analysis of gene expression but it can be generalized for other data types.
 
 Briefly, PAGE quantizes differential measurements into equally populated bins and then, for every given geneset, calculates the mutual information (MI) between each cluster bin and a binary vector of pathway memberships for genes in a given gene set. The significance of each MI value is then assessed through a randomization-based statistical test and hypergeometric distribution to determine whether there is over or under representation of a gene set in each cluster bin. The final result is a p-values matrix in which rows are gene sets and columns are cluster bins (visualized as heatmaps).
