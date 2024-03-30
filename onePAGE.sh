@@ -2,12 +2,16 @@ inDir=$1
 exp=$2
 geneset=$3
 
+if [ -z ${TEISERDIR+x} ]; then
+    echo "Error: TEISERDIR is not set. Please set TEISERDIR to the TEISER directory.";
+    return;
+fi
+
 cd $inDir
 
 outDir=${exp/.txt/}; 
 outDir=${outDir}_onePAGE_${geneset} 
 
-export TEISERDIR='/data_gilbert/home/aarab/Workflows/TEISERv1.1'
 echo $exp $geneset 
 base=`basename $exp` 
 base=${base/.txt/} 
