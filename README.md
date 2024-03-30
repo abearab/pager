@@ -4,11 +4,13 @@ Container of codes and data to run PAGE algorithm and enable further data curati
 ## Installation
 
 **Requirements:**
+
 Follw the instructions to install iPAGE and TEISER from the following links:
 - https://tavazoielab.c2b2.columbia.edu/iPAGE/ | [GitHub](https://github.com/hanig/PAGE)
 - https://tavazoielab.c2b2.columbia.edu/TEISER/ | [GitHub](https://github.com/hanig/TEISER)
 
 **Conda environment:**
+
 Create a conda environment and set the following environment variables to the paths of `pager` and `TEISER` directories.
 ```bash
 conda env create -n pager
