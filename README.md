@@ -14,18 +14,42 @@ docker build -t pager .
 # Run with setup instructions
 docker run pager
 
-# Run with your data mounted
+# Run with your data mounted (interactive shell)
 docker run -v /path/to/your/data:/data -it pager /bin/bash
 
 # If you have iPAGE and TEISER installed locally
 docker run -v /path/to/PAGE:/opt/PAGE -v /path/to/TEISER:/opt/TEISER -v /path/to/data:/data -it pager /bin/bash
+
+# Test the container functionality
+docker run pager /opt/pager/docker_test.sh
 ```
 
-Or use docker-compose:
+Or use docker-compose for easier management:
 
 ```bash
 # Edit docker-compose.yml to mount your local directories
-docker-compose run pager
+docker compose build
+docker compose run pager
+
+# Or run specific commands
+docker compose run pager python3 -c "import pager; help(pager)"
+```
+
+**Docker Examples:**
+
+```bash
+# Run iPAGE analysis (assuming you have the tools mounted)
+docker run -v /local/data:/data -v /local/PAGE:/opt/PAGE pager \
+  bash /opt/pager/iPAGE_loop.sh /data/input.txt
+
+# Run Python pager functions
+docker run -v /local/data:/data pager \
+  python3 -c "
+import sys; sys.path.append('/opt/pager')
+import pager
+df = pager.read_pvmatrix('/data/pvmatrix.txt')
+print(df.head())
+"
 ```
 
 **Option 2: Manual Installation**
