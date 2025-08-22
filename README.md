@@ -3,6 +3,33 @@ Container of codes and data to run PAGE algorithm and enable further data curati
 
 ## Installation
 
+**Option 1: Docker (Recommended)**
+
+The easiest way to use pager is with Docker. Build and run the container:
+
+```bash
+# Build the Docker image
+docker build -t pager .
+
+# Run with setup instructions
+docker run pager
+
+# Run with your data mounted
+docker run -v /path/to/your/data:/data -it pager /bin/bash
+
+# If you have iPAGE and TEISER installed locally
+docker run -v /path/to/PAGE:/opt/PAGE -v /path/to/TEISER:/opt/TEISER -v /path/to/data:/data -it pager /bin/bash
+```
+
+Or use docker-compose:
+
+```bash
+# Edit docker-compose.yml to mount your local directories
+docker-compose run pager
+```
+
+**Option 2: Manual Installation**
+
 **Requirements:**
 
 Follw the instructions to install iPAGE and TEISER from the following links:

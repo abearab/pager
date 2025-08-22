@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  pager:
+    build: .
+    image: pager:latest
+    container_name: pager
+    volumes:
+      # Mount your local data directory
+      - ./data:/data
+      # Mount iPAGE and TEISER tools if available locally
+      # - /path/to/your/PAGE:/opt/PAGE
+      # - /path/to/your/TEISER:/opt/TEISER
+    working_dir: /data
+    environment:
+      - PAGEDIR=/opt/PAGE
+      - TEISERDIR=/opt/TEISER
+    # Override default command to start interactive shell
+    command: /bin/bash
