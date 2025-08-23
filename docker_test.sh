@@ -8,14 +8,14 @@ echo ""
 
 # Test Python import
 echo "Testing Python environment..."
-python3 -c "
+python -c "
 import sys
 sys.path.append('/opt/pager')
 import pager
 import pandas as pd
 import os
 
-print('✓ Python 3 available')
+print('✓ Python available via conda')
 print('✓ pager module imported successfully')
 print('✓ pandas available:', pd.__version__)
 print('✓ Working directory:', os.getcwd())
@@ -45,4 +45,4 @@ echo "=== Docker Container Ready ==="
 echo "To get started:"
 echo "1. Mount your data: docker run -v /path/to/data:/data pager"
 echo "2. Mount iPAGE/TEISER tools for full functionality"
-echo "3. Use 'python3 -c \"import pager; help(pager)\"' to explore the module"
+echo "3. Use 'python -c \"import pager; help(pager)\"' to explore the module"

@@ -32,7 +32,7 @@ docker compose build
 docker compose run pager
 
 # Or run specific commands
-docker compose run pager python3 -c "import pager; help(pager)"
+docker compose run pager python -c "import pager; help(pager)"
 ```
 
 **Docker Examples:**
@@ -44,7 +44,7 @@ docker run -v /local/data:/data -v /local/PAGE:/opt/PAGE pager \
 
 # Run Python pager functions
 docker run -v /local/data:/data pager \
-  python3 -c "
+  python -c "
 import sys; sys.path.append('/opt/pager')
 import pager
 df = pager.read_pvmatrix('/data/pvmatrix.txt')
