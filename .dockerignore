@@ -1,0 +1,12 @@
+# Docker ignore file for pager
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.ipynb_checkpoints
+.DS_Store
